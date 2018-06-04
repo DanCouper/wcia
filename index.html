@@ -8,7 +8,14 @@
   <script>
     class MyCustomTag extends HTMLElement {
       connectedCallback() {
-        alert('Hello from my first custom element!');
+        this.innerHTML = `<h2>${this.getAttribute('title')}</h2><button>Click Me!</button>`;
+
+        Object.assign(this.style, {
+          'background-color': '#6C7A89',
+          'color': '#ECF0F1',
+          'display': 'inline-block',
+          'padding': '1.5rem',
+        });
       }
     }
 
@@ -18,6 +25,6 @@
   </script>
 </head>
 <body>
-  <my-custom-tag></my-custom-tag>
+  <my-custom-tag title="My Custom Element!"></my-custom-tag>
 </body>
 </html>
