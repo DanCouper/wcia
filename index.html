@@ -4,27 +4,95 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Web Components in Action</title>
+  <title>Web Components in Action | Photo Carousel</title>
   <script>
-    class MyCustomTag extends HTMLElement {
+    class PhotoCarousel extends HTMLElement {
       connectedCallback() {
-        this.innerHTML = `<h2>${this.getAttribute('title')}</h2><button>Click Me!</button>`;
+        this.photoIndex = 0;
+        this.photos = this.getAttribute('photos').split(',');
+        console.log(this.photos);
+        this.innerHTML = `
+          <h2 class="title">${this.getAttribute('title')}</h2>
+          <h4 class="author">by ${this.getAttribute('author')}</h4>
+          <div class="image-container"></div>
+          <button class="back">&lt</button>
+          <button class="forward">&gt</button>
+        `;
 
-        Object.assign(this.style, {
-          'background-color': '#6C7A89',
-          'color': '#ECF0F1',
-          'display': 'inline-block',
-          'padding': '1.5rem',
-        });
+        this.showPhoto();
+
+
+        this.querySelector('button.back').addEventListener('click', e => this.onBackButtonClick(e));
+        this.querySelector('button.forward').addEventListener('click', e => this.onForwardButtonClick(e));
+      }
+
+      showPhoto() {
+        this.querySelector('.image-container').style.backgroundImage =
+          `url(${this.photos[this.photoIndex]})`;
+      }
+
+      onBackButtonClick(e) {
+        this.photoIndex --;
+        if (this.photoIndex < 0) {
+          this.photoIndex = this.photos.length - 1;
+        }
+        this.showPhoto()
+      }
+
+      onForwardButtonClick(e) {
+        this.photoIndex ++;
+        if (this.photoIndex >= this.photos.length) {
+          this.photoIndex = 0;
+        }
+        this.showPhoto()
       }
     }
 
-    if (!customElements.get('my-custom-tag')) {
-      customElements.define('my-custom-tag', MyCustomTag);
+    if (!customElements.get('wcia-photo-carousel')) {
+      customElements.define('wcia-photo-carousel', PhotoCarousel);
     }
   </script>
+
+  <style>
+    /* Base styles */
+    body {
+      min-height: 100vh;
+      display: flex; 
+    }
+
+    wcia-photo-carousel {
+      margin: auto;
+      width: 600px;
+    }
+
+    /* Hacky dirty carousel CSS */
+    wcia-photo-carousel {
+      display: grid;
+      grid-template-columns: 1fr 10fr 1fr;
+      grid-template-rows: 1fr 1fr 4fr;
+      grid-template-areas:
+        "title title title"
+        "author author author"
+        "back image-container forward";
+    }
+
+    .title { grid-area: title; }
+    .author { grid-area: author; }
+    .back { grid-area: back; }
+    .image-container {
+      grid-area: image-container;
+      background-position: 50%;
+      background-repeat: no-repeat;
+      background-size: contain;
+    }
+    .forward { grid-area: forward; }
+  </style>
 </head>
 <body>
-  <my-custom-tag title="My Custom Element!"></my-custom-tag>
+  <wcia-photo-carousel
+    title="Scary Signs"
+    author="Daniel Couper"
+    photos="https://i.redditmedia.com/3CSpFu-J_nf1I4bXGQROkJe_MFZVN5h4TZ7sVi9UzVc.jpg?fit=crop&crop=faces%2Centropy&arh=2&w=960&s=cdf6b03835d16593888faa43e19a4256,https://i.redditmedia.com/3qKY6lz_h48ttdlBtQ8WWniTeenJMhuOc79Y-UH5NkM.jpg?fit=crop&crop=faces%2Centropy&arh=2&w=640&s=7083673693cab6fe3f33a619362848bb,https://i.redditmedia.com/Rm17V56WI4QcCc8uUNs5fRDwLLTzw13MRwwcDytw3JI.jpg?fit=crop&crop=faces%2Centropy&arh=2&w=960&s=aa9dc5b3dd78e94c62bff3cfe82239e3,https://i.redditmedia.com/oZ2U4Rppxf_g0bz8XY8JMG9hFB4c_D0HUTQJpuoTMoM.jpg?s=6a06c5c235dcace568aeb698bd12a963">
+  </wcia-photo-carousel>
 </body>
 </html>
